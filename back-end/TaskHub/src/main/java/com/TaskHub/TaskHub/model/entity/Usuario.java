@@ -1,8 +1,8 @@
 package com.TaskHub.TaskHub.model.entity;
 
+import com.TaskHub.TaskHub.model.dto.usuario.request.UsuarioCadastroRequest;
 import com.TaskHub.TaskHub.model.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,11 +31,17 @@ public class Usuario  implements UserDetails {
     @Column(nullable = false)
     private String senha;
     @Column(nullable = false)
-    private String data_nasc;
+    private String dataNasc;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public Usuario(UsuarioCadastroRequest dto) {
+        this.nome = dto.nome();
+        this.email = dto.email();
+        this.dataNasc = dto.dataNasc();
+        this.role = Role.USUARIO;
+    }
 
 
     @Override
