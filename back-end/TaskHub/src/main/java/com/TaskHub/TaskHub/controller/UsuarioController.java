@@ -1,7 +1,9 @@
 package com.TaskHub.TaskHub.controller;
 
 import com.TaskHub.TaskHub.model.dto.usuario.request.UsuarioCadastroRequest;
+import com.TaskHub.TaskHub.model.dto.usuario.request.UsuarioLoginRequest;
 import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioCadastroResponse;
+import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioLoginResponse;
 import com.TaskHub.TaskHub.model.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +24,10 @@ public class UsuarioController {
     public ResponseEntity<UsuarioCadastroResponse> cadastro(@RequestBody UsuarioCadastroRequest request){
         UsuarioCadastroResponse response = service.cadastro(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest request){
+        UsuarioLoginResponse usuario= service.login(request);
+        return ResponseEntity.ok(usuario);
     }
 }
