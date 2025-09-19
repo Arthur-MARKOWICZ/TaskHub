@@ -5,6 +5,7 @@ import com.TaskHub.TaskHub.model.dto.usuario.request.UsuarioLoginRequest;
 import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioCadastroResponse;
 import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioLoginResponse;
 import com.TaskHub.TaskHub.model.service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,5 +31,10 @@ public class UsuarioController {
     public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest request, HttpServletResponse response){
         UsuarioLoginResponse response1= service.login(request, response);
         return ResponseEntity.ok(response1);
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<UsuarioLoginResponse> refreshToken(HttpServletRequest request) {
+        UsuarioLoginResponse authResponse = service.refresh(request);
+        return ResponseEntity.ok(authResponse);
     }
 }
