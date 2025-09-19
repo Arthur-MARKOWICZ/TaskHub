@@ -33,13 +33,14 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         if (token != null) {
             try {
-                var email = tokenService.validateToken(token);
-                if (email != null) {
-                    var userOptional = usuarioRepository.findByEmail(email);
-                    if (userOptional.isPresent()) {
-                        var user = userOptional.get();
+
+                if (tokenService.validateToken(token)) {
+                    var email = tokenService.getSubject(token);
+                    var usuarioOptional = usuarioRepository.findByEmail(email);
+                    if (usuarioOptional.isPresent()) {
+                        var usuario = usuarioOptional.get();
                         var authentication = new UsernamePasswordAuthenticationToken(
-                                user, null, user.getAuthorities());
+                                usuarioOptional, null, usuario.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {
                         System.out.println("Usuario not found for email: " + email);

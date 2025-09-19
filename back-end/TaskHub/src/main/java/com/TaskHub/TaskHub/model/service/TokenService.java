@@ -2,9 +2,11 @@ package com.TaskHub.TaskHub.model.service;
 
 import com.TaskHub.TaskHub.model.entity.Usuario;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 @Service
 public class TokenService {
@@ -19,9 +22,13 @@ public class TokenService {
     private String secret ;
     @Value("${jwt.expiration}")
     private long jwtExpiration;
+    private  Long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7;
+    private Algorithm algorithm() {
+        return Algorithm.HMAC256(secret);
+    }
     public String generateToken(Usuario usuario){
         try{
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            var algorithm = algorithm();
             String token = JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(usuario.getEmail())
@@ -33,17 +40,26 @@ public class TokenService {
 
         }
     }
-    public String validateToken(String token) {
+    public String generateRefreshToken(Usuario usuario) {
+        return JWT.create()
+                .withSubject(usuario.getEmail())
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+                .sign(algorithm());
+    }
+    public boolean validateToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm)
-                    .withIssuer("auth-api", "reset-password")
-                    .build()
-                    .verify(token)
-                    .getSubject();
+            JWTVerifier verifier = JWT.require(algorithm()).build();
+            verifier.verify(token);
+            return true;
         } catch (JWTVerificationException e) {
-            return null;
+            return false;
         }
+    }
+    public String getSubject(String token) {
+        JWTVerifier verifier = JWT.require(algorithm()).build();
+        DecodedJWT jwt = verifier.verify(token);
+        return jwt.getSubject();
     }
     private Instant generateExpirationDate(){
         return LocalDateTime.now().plusHours(24).toInstant(ZoneOffset.of("-03:00"));

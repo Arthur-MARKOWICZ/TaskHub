@@ -5,6 +5,7 @@ import com.TaskHub.TaskHub.model.dto.usuario.request.UsuarioLoginRequest;
 import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioCadastroResponse;
 import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioLoginResponse;
 import com.TaskHub.TaskHub.model.service.UsuarioService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +27,8 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @PostMapping("/login")
-    public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest request){
-        UsuarioLoginResponse usuario= service.login(request);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest request, HttpServletResponse response){
+        UsuarioLoginResponse response1= service.login(request, response);
+        return ResponseEntity.ok(response1);
     }
 }

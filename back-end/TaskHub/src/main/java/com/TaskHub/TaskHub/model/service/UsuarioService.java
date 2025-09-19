@@ -9,6 +9,10 @@ import com.TaskHub.TaskHub.model.dto.usuario.response.UsuarioLoginResponse;
 import com.TaskHub.TaskHub.model.entity.Usuario;
 import com.TaskHub.TaskHub.model.repository.UsuarioRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +38,7 @@ public class UsuarioService {
                 usuario.getEmail(), usuario.getSenha(), usuario.getId());
         return response;
     }
-    public UsuarioLoginResponse login(UsuarioLoginRequest dto){
+    public UsuarioLoginResponse login(UsuarioLoginRequest dto, HttpServletResponse response){
         Optional<Usuario> usuario = repository.findByEmail(dto.email());
         if(usuario.isEmpty()){
             throw  new UsuarioNaoEncontrado("email ou senha incorreto");
@@ -42,8 +46,36 @@ public class UsuarioService {
         if(!encoder.matches(dto.senha(),usuario.get().getSenha())){
            throw  new SenhaErrada("email ou senha incorreto");
         }
-        String token = tokenService.generateToken(usuario.get());
-        UsuarioLoginResponse response = new UsuarioLoginResponse(token);
-        return  response;
+        String accessToken = tokenService.generateToken(usuario.get());
+        String refreshToken = tokenService.generateRefreshToken(usuario.get());
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return  new UsuarioLoginResponse(accessToken);
+    }
+    public UsuarioLoginResponse refresh(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    String refreshToken = cookie.getValue();
+                    if (tokenService.validateToken(refreshToken)) {
+                        String email = tokenService.getSubject(refreshToken);
+                        Usuario usuario = new Usuario();
+                        usuario.setEmail(email);
+
+                        String newAccessToken = tokenService.generateToken(usuario);
+                        return new UsuarioLoginResponse(newAccessToken);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Refresh token inválido");
     }
 }
