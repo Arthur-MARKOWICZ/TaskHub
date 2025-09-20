@@ -78,4 +78,8 @@ public class UsuarioService {
         }
         throw new RuntimeException("Refresh token inválido");
     }
+    public Usuario obterUsuarioPorEmail(String email){
+        var usuarioOptinal = repository.findByEmail(email);
+        return  usuarioOptinal.get();
+    }
 }
