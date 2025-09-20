@@ -25,7 +25,8 @@ public class ProjetoService {
         projeto.setDescricao(request.descricao());
         projeto.setNome(request.nome());
         projeto.setUsuario(usuario);
-
+        repository.save(projeto);
+        return new ProjetoCadastroResponse(projeto);
     }
 
 }
