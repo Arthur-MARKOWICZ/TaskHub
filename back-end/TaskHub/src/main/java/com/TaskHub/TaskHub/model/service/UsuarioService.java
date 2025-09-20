@@ -82,4 +82,9 @@ public class UsuarioService {
         var usuarioOptinal = repository.findByEmail(email);
         return  usuarioOptinal.get();
     }
+    public Usuario obterUSuarioPorToken(String token){
+        var email = tokenService.getSubject(token);
+        var usuario = this.obterUsuarioPorEmail(email);
+        return usuario;
+    }
 }
