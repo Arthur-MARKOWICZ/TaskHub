@@ -35,7 +35,8 @@ public class Usuario  implements UserDetails {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
-
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tarefa> tarefas;
     public Usuario(UsuarioCadastroRequest dto) {
         this.nome = dto.nome();
         this.email = dto.email();
