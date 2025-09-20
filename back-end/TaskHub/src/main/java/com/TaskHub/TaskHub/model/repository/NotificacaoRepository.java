@@ -1,4 +1,7 @@
 package com.TaskHub.TaskHub.model.repository;
 
-public interface NotificacaoRepository {
+import com.TaskHub.TaskHub.model.entity.Notificacao;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface NotificacaoRepository extends JpaRepository<Notificacao,Long> {
 }

@@ -1,4 +1,7 @@
 package com.TaskHub.TaskHub.model.repository;
 
-public interface ProjetoRepository {
+import com.TaskHub.TaskHub.model.entity.Projeto;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProjetoRepository extends JpaRepository<Projeto,Long> {
 }
