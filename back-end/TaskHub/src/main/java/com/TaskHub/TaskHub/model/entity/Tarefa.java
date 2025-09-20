@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Stack;
 
 @Entity
@@ -31,5 +32,17 @@ public class Tarefa {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+    @ManyToOne
+    @JoinColumn(name = "projeto_id")
+    private Projeto projeto;
+    @ManyToMany
+    @JoinTable(
+            name = "tarefa_tag",
+            joinColumns = @JoinColumn(name = "tarefa_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 
+    @OneToMany(mappedBy = "tarefa", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comentario> comentarios;
 }
